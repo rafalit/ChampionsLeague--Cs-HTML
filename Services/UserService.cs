@@ -32,6 +32,11 @@ namespace WebApplication1.Services
             return null;
         }
 
+        public List<User> Get()
+        {
+            return _users.Find(user=>true).ToList();
+        }
+
         public User Get(string id)
         {
             return _users.Find(u => u.UserId == id).FirstOrDefault();

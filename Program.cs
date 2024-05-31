@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using WebApplication1.Models;
@@ -17,7 +21,8 @@ builder.Services.AddSingleton<IMongoClient>(s =>
 builder.Services.AddScoped<IClubsService, ClubsService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -31,8 +36,51 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseRouting();
+
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/account/login");
+        return;
+    }
+
+    await next();
+});
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Account}/{action=Login}/{id?}");
+
+    // Trasa do kontrolera u¿ytkowników
+    endpoints.MapControllerRoute(
+        name: "users",
+        pattern: "api/Users/{action=Login}/{id?}",
+        defaults: new { controller = "Users" });
+
+    // Trasa do kontrolera klubów
+    endpoints.MapControllerRoute(
+        name: "clubs",
+        pattern: "api/Clubs/{action=Get}/{id?}",
+        defaults: new { controller = "Clubs" });
+
+    // Usuñ domyœln¹ trasê do prognozy pogody
+    endpoints.MapControllerRoute(
+        name: "weather",
+        pattern: "WeatherForecast/{id?}",
+        defaults: new { controller = "WeatherForecast", action = "Get" });
+
+    endpoints.MapControllerRoute(
+    name: "teams",
+    pattern: "api/Teams/{action=ChooseTeam}/{id?}",
+    defaults: new { controller = "Teams" });
+});
 
 app.Run();

@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Your Team</title>
+    <style>
+        .team-thumbnail {
+            width: auto;
+            height: 200px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Choose Your Team</h1>
+    <form id="teamSelectionForm" action="/teams/select" method="post">
+        <input type="hidden" id="selectedTeam" name="selectedTeam" value="">
+    </form>
+    <div id="teamThumbnails">
+        <!-- Team thumbnails will be dynamically inserted here -->
+    </div>
+
+    <script>
+        // Pobierz dane zespołów z serwera
+        fetch('/api/teams')
+            .then(response => response.json())
+            .then(teams => {
+                const teamThumbnailsContainer = document.getElementById('teamThumbnails');
+                teams.forEach(team => {
+                    const img = document.createElement('img');
+                    img.src = team.photo; // Przyjmując, że 'photo' to pole przechowujące linki do zdjęć
+                    img.alt = team.name; // Przyjmując, że 'name' to pole przechowujące nazwy zespołów
+                    img.className = 'team-thumbnail';
+                    img.onclick = () => selectTeam(team.id); // Przyjmując, że 'id' to pole przechowujące identyfikatory zespołów
+                    teamThumbnailsContainer.appendChild(img);
+                });
+            })
+            .catch(error => console.error('Error fetching teams:', error));
+
+        // Funkcja do przekierowania po wybraniu zespołu
+        function selectTeam(teamId) {
+            document.getElementById('selectedTeam').value = teamId;
+            document.getElementById('teamSelectionForm').submit();
+        }
+    </script>
+</body>
+</html>

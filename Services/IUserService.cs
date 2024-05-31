@@ -7,6 +7,7 @@ namespace WebApplication1.Services
     {
         User Login(string username, string password);
         User Register(User user, string password);
+        List<User> Get();
         User Get(string id);
     }
 }

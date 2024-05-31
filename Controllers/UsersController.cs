@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Services;
+using System.Collections.Generic;
 
 namespace WebApplication1.Controllers
 {
@@ -40,7 +41,12 @@ namespace WebApplication1.Controllers
             return Ok(user);
         }
 
-        // Placeholder GetById method
+        [HttpGet("getAll")]
+        public ActionResult<List<User>> GetAll()
+        {
+            return _userService.Get();
+        }
+
         [HttpGet("{id}")]
         public ActionResult<User> GetById(string id)
         {
@@ -51,6 +57,20 @@ namespace WebApplication1.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpGet("login")]
+        public IActionResult Login()
+        {
+            // Przekieruj na stronę logowania
+            return RedirectToAction("Login", "Users");
+        }
+
+        [HttpGet("register")]
+        public IActionResult Register()
+        {
+            // Przekieruj na stronę rejestracji
+            return RedirectToAction("Register", "Users");
         }
 
         public class RegisterModel
