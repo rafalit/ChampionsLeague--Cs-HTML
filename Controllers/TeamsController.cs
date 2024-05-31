@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using WebApplication1.Models;
 using WebApplication1.Services;
+using System.Collections.Generic;
 
 namespace WebApplication1.Controllers
 {
@@ -16,16 +16,19 @@ namespace WebApplication1.Controllers
 
         public IActionResult ChooseTeam()
         {
-            // Pobierz linki do zdjęć z bazy danych
-            var clubs = _clubsService.Get(); // Załóżmy, że serwis ClubsService ma metodę GetAll, która pobiera wszystkie kluby z bazy danych
-            var teamImages = new List<string>();
-            foreach (var club in clubs)
-            {
-                teamImages.Add(club.Photo); // Zakładając, że właściwość Photo w modelu Club zawiera linki do zdjęć
-            }
+            var clubs = _clubsService.Get();
+            return View(clubs);
+        }
 
-            // Przekazujemy listę linków do zdjęć do widoku
-            return View(teamImages);
+        [HttpPost]
+        public IActionResult SelectTeam(string teamId)
+        {
+            _clubsService.AddSelectedClub(teamId);
+            if (_clubsService.SelectedClubsCount() == 32)
+            {
+                return RedirectToAction("DrawGroups");
+            }
+            return RedirectToAction("ChooseTeam");
         }
 
         [HttpGet("/api/teams")]
@@ -33,6 +36,32 @@ namespace WebApplication1.Controllers
         {
             var teams = _clubsService.Get();
             return Json(teams);
+        }
+
+        [HttpGet("DrawGroups")]
+        public IActionResult DrawGroups()
+        {
+            var selectedClubs = _clubsService.GetSelectedClubs();
+            var groups = DrawGroups(selectedClubs);
+            return View(groups);
+        }
+
+        private List<Group> DrawGroups(List<Club> clubs)
+        {
+            var groups = new List<Group>();
+            for (int i = 0; i < 8; i++)
+            {
+                groups.Add(new Group { Name = $"Group {i + 1}", Teams = new List<Club>() });
+            }
+
+            var random = new Random();
+            foreach (var club in clubs)
+            {
+                var groupIndex = random.Next(0, 8);
+                groups[groupIndex].Teams.Add(club);
+            }
+
+            return groups;
         }
     }
 }

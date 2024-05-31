@@ -1,0 +1,16 @@
+﻿@model List<WebApplication1.Models.Group>
+
+<h1>Groups</h1>
+
+@foreach (var group in Model)
+{
+    <div>
+        <h3>@group.Name</h3>
+        <ul>
+            @foreach (var team in group.Teams)
+            {
+                <li>@team.Name - @team.Country</li>
+            }
+        </ul>
+    </div>
+}

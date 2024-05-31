@@ -12,5 +12,9 @@ namespace WebApplication1.Services
         void Update(string id, Club club);
 
         void Remove(string id);
+        void AddSelectedClub(string clubId);
+        int SelectedClubsCount();
+
+        List<Club> GetSelectedClubs();
     }
 }

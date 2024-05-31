@@ -8,41 +8,109 @@
         .team-thumbnail {
             width: auto;
             height: 200px;
-            margin: 10px;
+            margin: 15px;
             cursor: pointer;
+            position: relative;
+        }
+
+        .selected-team {
+            border: 8px solid green;
+        }
+
+        .team-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px;
+            border-radius: 50%;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
     <h1>Choose Your Team</h1>
     <form id="teamSelectionForm" action="/teams/select" method="post">
-        <input type="hidden" id="selectedTeam" name="selectedTeam" value="">
+        <input type="hidden" id="selectedTeam" name="teamId" value="">
     </form>
     <div id="teamThumbnails">
         <!-- Team thumbnails will be dynamically inserted here -->
     </div>
 
     <script>
-        // Pobierz dane zespołów z serwera
+        let selectedTeams = 0; // Counter for selected teams
+        const selectedTeamIds = new Map(); // Map to store selected team ids and their corresponding numbers
+
         fetch('/api/teams')
             .then(response => response.json())
             .then(teams => {
                 const teamThumbnailsContainer = document.getElementById('teamThumbnails');
                 teams.forEach(team => {
+                    const container = document.createElement('div');
+                    container.style.position = 'relative';
+                    container.style.display = 'inline-block';
+
                     const img = document.createElement('img');
-                    img.src = team.photo; // Przyjmując, że 'photo' to pole przechowujące linki do zdjęć
-                    img.alt = team.name; // Przyjmując, że 'name' to pole przechowujące nazwy zespołów
+                    img.src = team.photo;
+                    img.alt = team.name;
                     img.className = 'team-thumbnail';
-                    img.onclick = () => selectTeam(team.id); // Przyjmując, że 'id' to pole przechowujące identyfikatory zespołów
-                    teamThumbnailsContainer.appendChild(img);
+                    img.onclick = () => selectTeam(container, team.id);
+
+                    container.appendChild(img);
+                    teamThumbnailsContainer.appendChild(container);
                 });
             })
             .catch(error => console.error('Error fetching teams:', error));
 
-        // Funkcja do przekierowania po wybraniu zespołu
-        function selectTeam(teamId) {
-            document.getElementById('selectedTeam').value = teamId;
-            document.getElementById('teamSelectionForm').submit();
+        function selectTeam(container, teamId) {
+            const img = container.querySelector('img');
+            if (img.classList.contains('selected-team')) {
+                // Deselect team
+                const deselectedTeamNumber = selectedTeamIds.get(teamId);
+                selectedTeams--;
+                selectedTeamIds.delete(teamId);
+                img.classList.remove('selected-team');
+                const numberSpan = container.querySelector('.team-number');
+                if (numberSpan) {
+                    container.removeChild(numberSpan);
+                }
+                // Decrease the number for all selected teams after the deselected team
+                selectedTeamIds.forEach((number, id) => {
+                    if (number > deselectedTeamNumber) {
+                        const teamContainer = document.querySelector(`[data-team-id="${id}"]`);
+                        const span = teamContainer.querySelector('.team-number');
+                        span.textContent = number - 1;
+                        selectedTeamIds.set(id, number - 1);
+                    }
+                });
+            } else {
+                // Select team
+                if (selectedTeams < 32) {
+                    selectedTeams++;
+                    selectedTeamIds.set(teamId, selectedTeams); // Store teamId with its selected number
+                    img.classList.add('selected-team');
+                    const span = document.createElement('span');
+                    span.className = 'team-number';
+                    span.textContent = selectedTeams; // Display the current selected number
+                    container.appendChild(span);
+                    container.setAttribute('data-team-id', teamId);
+                }
+            }
+
+            // Check if 32 teams have been selected
+            if (selectedTeams === 32) {
+                selectedTeamIds.forEach((number, id) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'selectedTeamIds';
+                    input.value = id;
+                    document.getElementById('teamSelectionForm').appendChild(input);
+                });
+
+                document.getElementById('teamSelectionForm').submit();
+                window.location.href = '/teams/DrawGroups';
+            }
         }
     </script>
 </body>

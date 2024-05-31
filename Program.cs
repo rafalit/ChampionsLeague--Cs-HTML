@@ -10,19 +10,18 @@ using WebApplication1.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<ClubsStoreDatabaseSettings>(
-                builder.Configuration.GetSection(nameof(ClubsStoreDatabaseSettings)));
+    builder.Configuration.GetSection(nameof(ClubsStoreDatabaseSettings)));
 
 builder.Services.AddSingleton<IClubsStoreDatabaseSettings>(sp =>
     sp.GetRequiredService<IOptions<ClubsStoreDatabaseSettings>>().Value);
 
 builder.Services.AddSingleton<IMongoClient>(s =>
-        new MongoClient(builder.Configuration.GetValue<string>("ClubsStoreDatabaseSettings:ConnectionString")));
+    new MongoClient(builder.Configuration.GetValue<string>("ClubsStoreDatabaseSettings:ConnectionString")));
 
 builder.Services.AddScoped<IClubsService, ClubsService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -35,11 +34,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseAuthorization();
-
 app.UseRouting();
 
 app.Use(async (context, next) =>
@@ -59,28 +55,25 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Account}/{action=Login}/{id?}");
 
-    // Trasa do kontrolera u¿ytkowników
     endpoints.MapControllerRoute(
         name: "users",
         pattern: "api/Users/{action=Login}/{id?}",
         defaults: new { controller = "Users" });
 
-    // Trasa do kontrolera klubów
     endpoints.MapControllerRoute(
         name: "clubs",
         pattern: "api/Clubs/{action=Get}/{id?}",
         defaults: new { controller = "Clubs" });
 
-    // Usuñ domyœln¹ trasê do prognozy pogody
     endpoints.MapControllerRoute(
         name: "weather",
         pattern: "WeatherForecast/{id?}",
         defaults: new { controller = "WeatherForecast", action = "Get" });
 
     endpoints.MapControllerRoute(
-    name: "teams",
-    pattern: "api/Teams/{action=ChooseTeam}/{id?}",
-    defaults: new { controller = "Teams" });
+        name: "teams",
+        pattern: "api/Teams/{action=ChooseTeam}/{id?}",
+        defaults: new { controller = "Teams" });
 });
 
 app.Run();
