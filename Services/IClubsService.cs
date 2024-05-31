@@ -1,0 +1,16 @@
+﻿using WebApplication1.Models;
+
+namespace WebApplication1.Services
+{
+    public interface IClubsService
+    {
+        List<Club> Get();
+        Club Get(string id);
+
+        Club Create(Club club);
+
+        void Update(string id, Club club);
+
+        void Remove(string id);
+    }
+}
