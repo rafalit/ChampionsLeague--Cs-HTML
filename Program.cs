@@ -3,9 +3,7 @@ using MongoDB.Driver;
 using WebApplication1.Models;
 using WebApplication1.Services;
 
-
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.Configure<ClubsStoreDatabaseSettings>(
                 builder.Configuration.GetSection(nameof(ClubsStoreDatabaseSettings)));
@@ -17,18 +15,14 @@ builder.Services.AddSingleton<IMongoClient>(s =>
         new MongoClient(builder.Configuration.GetValue<string>("ClubsStoreDatabaseSettings:ConnectionString")));
 
 builder.Services.AddScoped<IClubsService, ClubsService>();
-// Add services to the container.
-
-
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
