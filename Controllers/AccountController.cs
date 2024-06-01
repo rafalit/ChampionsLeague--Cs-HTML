@@ -32,7 +32,7 @@ namespace WebApplication1.Controllers
             }
 
             // Przekierowanie na stronę z wyborem zespołów po zalogowaniu
-            return Redirect("/teams/chooseteam");
+            return RedirectToAction("ChooseTeam", "Teams");
         }
 
         [HttpGet("account/register")]
@@ -53,9 +53,20 @@ namespace WebApplication1.Controllers
                 };
 
                 _userService.Register(user, model.Password);
-                return Redirect("/account/login");
+                return RedirectToAction("Login");
             }
-            return Redirect("/account/register"); // Możesz dodać komunikat o błędzie w register.html
+
+            // Jeśli ModelState.IsValid nie jest prawdziwe, dodaj błędy do ModelState
+            foreach (var modelState in ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    ModelState.AddModelError("", error.ErrorMessage);
+                }
+            }
+
+            // Przekieruj użytkownika z powrotem do formularza rejestracji z błędami
+            return View("~/wwwroot/account/register.html", model);
         }
     }
 }

@@ -17,8 +17,15 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost("register")]
-        public ActionResult<User> Register([FromBody] RegisterModel model)
+        public ActionResult<User> Register([FromForm] RegisterModel model)
         {
+            // Sprawdź, czy dane są poprawne
+            if (!ModelState.IsValid)
+            {
+                // Jeśli dane są nieprawidłowe, zwróć błąd walidacji z odpowiednimi komunikatami
+                return BadRequest(ModelState);
+            }
+
             var user = new User
             {
                 Username = model.Username,
@@ -26,7 +33,9 @@ namespace WebApplication1.Controllers
             };
 
             var createdUser = _userService.Register(user, model.Password);
-            return CreatedAtAction(nameof(GetById), new { id = createdUser.UserId }, createdUser);
+
+            // Zwróć odpowiedź HTTP z kodem 200 (OK) i nowo utworzonym użytkownikiem jako treścią odpowiedzi
+            return Ok(createdUser);
         }
 
         [HttpPost("login")]
@@ -63,7 +72,7 @@ namespace WebApplication1.Controllers
         public IActionResult Login()
         {
             // Przekieruj na stronę logowania
-            return RedirectToAction("Login", "Users");
+            return RedirectToAction("Login", "Account", new { successMessage = "Account created successfully! Please login." });
         }
 
         [HttpGet("register")]

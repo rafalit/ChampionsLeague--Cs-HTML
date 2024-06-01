@@ -5,16 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choose Your Team</title>
     <style>
-        .team-thumbnail {
-            width: auto;
-            height: 200px;
-            margin: 15px;
-            cursor: pointer;
+        #teamThumbnails {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* 5 columns */
+            gap: 20px 20px; /* space between items */
+        }
+
+        .team-container {
+            width: 220px; /* Fixed width for consistency */
+            height: 220px; /* Fixed height for consistency */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid gray; /* Default gray border */
             position: relative;
+            box-sizing: border-box;
+        }
+
+        .team-thumbnail {
+            max-width: 100%;
+            max-height: 100%;
+            cursor: pointer;
         }
 
         .selected-team {
-            border: 8px solid green;
+            border-width: 8px; /* Thicker border */
+            border-color: green; /* Green border when selected */
+            border-style: solid;
         }
 
         .team-number {
@@ -30,7 +47,7 @@
     </style>
 </head>
 <body>
-    <h1>Choose Your Team</h1>
+    <h1>Choose 32 Teams</h1>
     <form id="teamSelectionForm" action="/teams/select" method="post">
         <input type="hidden" id="selectedTeam" name="teamId" value="">
     </form>
@@ -48,8 +65,7 @@
                 const teamThumbnailsContainer = document.getElementById('teamThumbnails');
                 teams.forEach(team => {
                     const container = document.createElement('div');
-                    container.style.position = 'relative';
-                    container.style.display = 'inline-block';
+                    container.className = 'team-container';
 
                     const img = document.createElement('img');
                     img.src = team.photo;
@@ -65,12 +81,12 @@
 
         function selectTeam(container, teamId) {
             const img = container.querySelector('img');
-            if (img.classList.contains('selected-team')) {
+            if (container.classList.contains('selected-team')) {
                 // Deselect team
                 const deselectedTeamNumber = selectedTeamIds.get(teamId);
                 selectedTeams--;
                 selectedTeamIds.delete(teamId);
-                img.classList.remove('selected-team');
+                container.classList.remove('selected-team');
                 const numberSpan = container.querySelector('.team-number');
                 if (numberSpan) {
                     container.removeChild(numberSpan);
@@ -89,7 +105,7 @@
                 if (selectedTeams < 32) {
                     selectedTeams++;
                     selectedTeamIds.set(teamId, selectedTeams); // Store teamId with its selected number
-                    img.classList.add('selected-team');
+                    container.classList.add('selected-team');
                     const span = document.createElement('span');
                     span.className = 'team-number';
                     span.textContent = selectedTeams; // Display the current selected number

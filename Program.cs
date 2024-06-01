@@ -74,6 +74,11 @@ app.UseEndpoints(endpoints =>
         name: "teams",
         pattern: "api/Teams/{action=ChooseTeam}/{id?}",
         defaults: new { controller = "Teams" });
+
+    endpoints.MapControllerRoute(
+    name: "account",
+    pattern: "account/{action=Login}/{id?}",
+    defaults: new { controller = "Account" });
 });
 
 app.Run();
