@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choose Your Team</title>
+    <title>Choose 32 Teams</title>
     <style>
         #teamThumbnails {
             display: grid;
@@ -48,7 +48,7 @@
 </head>
 <body>
     <h1>Choose 32 Teams</h1>
-    <form id="teamSelectionForm" action="/teams/select" method="post">
+    <form id="teamSelectionForm" action="/Teams/SelectTeam" method="post">
         <input type="hidden" id="selectedTeam" name="teamId" value="">
     </form>
     <div id="teamThumbnails">
@@ -59,7 +59,7 @@
         let selectedTeams = 0; // Counter for selected teams
         const selectedTeamIds = new Map(); // Map to store selected team ids and their corresponding numbers
 
-        fetch('/api/teams')
+        fetch('/api/Teams')
             .then(response => response.json())
             .then(teams => {
                 const teamThumbnailsContainer = document.getElementById('teamThumbnails');
@@ -125,7 +125,6 @@
                 });
 
                 document.getElementById('teamSelectionForm').submit();
-                window.location.href = '/teams/DrawGroups';
             }
         }
     </script>

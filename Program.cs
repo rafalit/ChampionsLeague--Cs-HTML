@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using WebApplication1.Models;
@@ -9,18 +9,27 @@ using WebApplication1.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<ClubsStoreDatabaseSettings>(
-    builder.Configuration.GetSection(nameof(ClubsStoreDatabaseSettings)));
+// Konfiguracja aplikacji
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-builder.Services.AddSingleton<IClubsStoreDatabaseSettings>(sp =>
-    sp.GetRequiredService<IOptions<ClubsStoreDatabaseSettings>>().Value);
+// Rejestracja us³ug MongoDB
+builder.Services.Configure<ClubsStoreDatabaseSettings>(builder.Configuration.GetSection(nameof(ClubsStoreDatabaseSettings)));
+builder.Services.AddSingleton<IClubsStoreDatabaseSettings>(sp => sp.GetRequiredService<IOptions<ClubsStoreDatabaseSettings>>().Value);
+builder.Services.AddSingleton<IMongoClient>(s => new MongoClient(builder.Configuration.GetValue<string>("ClubsStoreDatabaseSettings:ConnectionString")));
 
-builder.Services.AddSingleton<IMongoClient>(s =>
-    new MongoClient(builder.Configuration.GetValue<string>("ClubsStoreDatabaseSettings:ConnectionString")));
-
+// Rejestracja serwisów
 builder.Services.AddScoped<IClubsService, ClubsService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Dodanie obs³ugi sesji
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Rejestracja kontrolerów i widoków
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -37,6 +46,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthorization();
 app.UseRouting();
+
+app.UseSession(); // Dodanie obs³ugi sesji
 
 app.Use(async (context, next) =>
 {
@@ -72,13 +83,18 @@ app.UseEndpoints(endpoints =>
 
     endpoints.MapControllerRoute(
         name: "teams",
-        pattern: "api/Teams/{action=ChooseTeam}/{id?}",
+        pattern: "api/Teams/{action=GetTeams}/{id?}",
         defaults: new { controller = "Teams" });
 
     endpoints.MapControllerRoute(
-    name: "account",
-    pattern: "account/{action=Login}/{id?}",
-    defaults: new { controller = "Account" });
+        name: "drawGroups",
+        pattern: "Teams/DrawGroups",
+        defaults: new { controller = "Teams", action = "DrawGroups" });
+
+    endpoints.MapControllerRoute(
+        name: "chooseTeam",
+        pattern: "Teams/ChooseTeam",
+        defaults: new { controller = "Teams", action = "ChooseTeam" });
 });
 
 app.Run();

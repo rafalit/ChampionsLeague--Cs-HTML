@@ -1,16 +1,118 @@
 ﻿@model List<WebApplication1.Models.Group>
 
-<h1>Groups</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw Groups</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
 
-@foreach (var group in Model)
-{
-    <div>
-        <h3>@group.Name</h3>
-        <ul>
-            @foreach (var team in group.Teams)
-            {
-                <li>@team.Name - @team.Country</li>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .group-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            table-layout: fixed;
+            border: 2px solid #ddd;
+        }
+
+            .group-table th,
+            .group-table td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: center;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                vertical-align: top; /* Dodajemy właściwość vertical-align: top; */
+                height: 50px; /* Ustalamy stałą wysokość komórek */
             }
-        </ul>
+
+        .group-header {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .team-logo {
+            max-width: 50px;
+            max-height: 50px;
+        }
+
+        .group-container {
+            margin-bottom: 20px;
+        }
+
+        .group-header h3 {
+            margin: 10px 0;
+        }
+
+        .team-name {
+            padding-top: 30px; /* Dodajemy dodatkowy margines z góry */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Groups</h1>
+
+        <div class="group-container">
+            <table class="group-table">
+                <thead>
+                    <tr>
+                        @for (int i = 0; i < 2; i++)
+                        {
+                            <th>Group @((i * 4) + 1) - @((i * 4) + 4)</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        @for (int i = 0; i < 2; i++)
+                        {
+                            <td>
+                                @for (int j = 0; j < 4; j++)
+                                {
+                                    var index = (i * 4) + j;
+                                    if (index < Model.Count)
+                                    {
+                                        var group = Model[index];
+                                        <div class="group-header">
+                                            <h3>@group.Name</h3>
+                                        </div>
+                                        <table class="group-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Logo</th>
+                                                    <th>Team Name</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var team in group.Teams)
+                                                {
+                                                    <tr>
+                                                        <td><img src="@team.Photo" alt="@team.Name" class="team-logo"></td>
+                                                        <td class="team-name">@team.Name</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+                                }
+                            </td>
+                        }
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-}
+</body>
+</html>
