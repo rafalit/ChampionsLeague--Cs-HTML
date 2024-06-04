@@ -6,7 +6,7 @@
     <title>Draw Groups</title>
     <style>
         body {
-            font-family: Anton;
+            font-family: Bebas Neue;
         }
 
         .container {
@@ -23,27 +23,27 @@
             border: 2px solid #ddd;
         }
 
-            .group-table th,
-            .group-table td {
-                border: 1px solid #ddd;
-                padding: 10px;
-                text-align: center;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                vertical-align: top;
-                height: 50px;
-            }
+        .group-table th,
+        .group-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: top;
+            height: 50px;
+        }
 
-                .group-table th.logo-column,
-                .group-table td.logo-column {
-                    width: 25%; /* Adjust this width as needed */
-                }
+        .group-table th.logo-column,
+        .group-table td.logo-column {
+            width: 25%; /* Adjust this width as needed */
+        }
 
-                .group-table th.name-column,
-                .group-table td.name-column {
-                    width: 75%; /* Adjust this width as needed */
-                }
+        .group-table th.name-column,
+        .group-table td.name-column {
+            width: 75%; /* Adjust this width as needed */
+        }
 
         .group-header {
             background-color: #007bff;
@@ -93,38 +93,81 @@
             color: green;
         }
 
-            .buttons button {
-                margin-bottom: 10px;
-                padding: 10px;
-                font-size: 16px;
-                color: green;
-                cursor: pointer;
-            }
+        .buttons button {
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            color: green;
+            cursor: pointer;
+        }
     </style>
+    <script src="https://randojs.com/1.0.0.js"></script>
     <script>
-        function selectTeams() {
+        function swapAndSelectTeams() {
+            const groupTables = document.querySelectorAll('.group-container table.group-table');
+            groupTables.forEach(table => {
+                const teamRows = table.querySelectorAll('tbody tr'); // Wybieramy tylko wiersze zespołów, pomijając nagłówki
+
+                // Zamiana miejscami odpowiednich rzędów
+                if (teamRows.length >= 4) {
+                    const firstTeam = teamRows[rando(1, 4)];
+                    const secondTeam = teamRows[rando(1, 4)];
+                    const thirdTeam = teamRows[rando(1, 4)];
+                    const fourthTeam = teamRows[rando(1, 4)];
+
+                    if (firstTeam && secondTeam && thirdTeam && fourthTeam) {
+                        swapRows(firstTeam, secondTeam);
+                        swapRows(thirdTeam, fourthTeam);
+                    }
+                }
+
+            });
+        }
+
+        function swapRows(row1, row2) {
+            const name1 = row1.querySelector('.team-name');
+            const name2 = row2.querySelector('.team-name');
+
+            if (name1 !== null && name2 !== null) {
+                const parent = row1.parentNode;
+                const nextSibling = row1.nextSibling === row2 ? row1 : row1.nextSibling;
+                parent.insertBefore(row2, row1);
+                parent.insertBefore(row1, nextSibling);
+            }
+        }
+
+        function assignColors() {
+            
+            swapAndSelectTeams();
+            
             const groupTables = document.querySelectorAll('.group-container table.group-table');
 
             // Iteracja przez każdą tabelę z grupą
             groupTables.forEach(table => {
+                
                 // Usunięcie wcześniej zaznaczonych drużyn
                 const selectedTeams = table.querySelectorAll('.selected-team');
+                const europeTeams = table.querySelectorAll('.europe-league');
+
                 selectedTeams.forEach(team => {
-                    team.classList.remove('selected-team', 'europe-league');
+                    team.classList.remove('selected-team');
+                });
+                europeTeams.forEach(team => {
+                    team.classList.remove('europe-league');
                 });
 
                 // Zaznaczenie odpowiednich drużyn w każdej grupie
                 const teamRows = table.querySelectorAll('tbody tr');
-                if (teamRows.length >= 2) {
-                    teamRows[1].classList.add('selected-team'); // Pierwsza drużyna
+                
+                if (teamRows.length == 5) {
+                    teamRows[1].classList.add('selected-team');
+                    teamRows[2].classList.add('selected-team');
+                    teamRows[3].classList.add('europe-league'); // Trzecia drużyna od końca (Europa League)
                 }
-                if (teamRows.length >= 3) {
-                    teamRows[teamRows.length - 3].classList.add('selected-team'); // Druga drużyna od końca
-                }
-                if (teamRows.length >= 4) {
-                    teamRows[teamRows.length - 2].classList.add('europe-league'); // Trzecia drużyna od końca (Europa League)
-                }
+                console.log(table);
             });
+
+            
 
             // Pobranie zaznaczonych drużyn i ich danych
             const selectedTeams = Array.from(document.querySelectorAll('.selected-team')).map(row => {
@@ -133,10 +176,8 @@
                     id: row.dataset.id
                 };
             });
-            console.log('Selected teams:', selectedTeams);
+            //console.log(selectedTeams);
         }
-
-
 
         function proceedToKnockout() {
             const selectedTeams = document.querySelectorAll('.selected-team');
@@ -154,16 +195,12 @@
                 }
             });
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelector('button[onclick="selectTeams()"]').addEventListener('click', selectTeams);
-        });
     </script>
 </head>
 <body>
     <div class="container">
         <div class="buttons">
-            <button onclick="selectTeams()">Select Teams for Knockout Stage</button>
+            <button onclick="assignColors()">Select Teams for Knockout Stage</button>
             <button onclick="proceedToKnockout()">Proceed to Knockout Stage</button>
         </div>
 
