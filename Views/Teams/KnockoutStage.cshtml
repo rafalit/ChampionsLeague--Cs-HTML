@@ -1,0 +1,100 @@
+﻿@model List<(WebApplication1.Models.Club, WebApplication1.Models.Club)>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knockout Stage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .knockout-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            table-layout: fixed;
+            border: 2px solid #ddd;
+        }
+
+            .knockout-table th,
+            .knockout-table td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: center;
+                vertical-align: middle;
+                height: 100px;
+            }
+
+        .match-header {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .team-logo {
+            max-width: 50px;
+            max-height: 50px;
+        }
+
+        .match-container {
+            margin-bottom: 20px;
+        }
+
+        .team-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+            .buttons button {
+                margin-bottom: 10px;
+                padding: 10px;
+                font-size: 16px;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Knockout Stage</h1>
+
+        @foreach (var match in Model)
+        {
+            <div class="match-container">
+                <table class="knockout-table">
+                    <thead>
+                        <tr>
+                            <th class="match-header" colspan="2">Match</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <img src="@match.Item1.Photo" alt="@match.Item1.Name" class="team-logo"><br>
+                                <span class="team-name">@match.Item1.Name</span>
+                            </td>
+                            <td>
+                                <img src="@match.Item2.Photo" alt="@match.Item2.Name" class="team-logo"><br>
+                                <span class="team-name">@match.Item2.Name</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</body>
+</html>

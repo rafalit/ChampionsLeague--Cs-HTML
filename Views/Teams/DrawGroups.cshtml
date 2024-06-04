@@ -1,6 +1,4 @@
-﻿@model List<WebApplication1.Models.Group>
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +6,7 @@
     <title>Draw Groups</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Anton;
         }
 
         .container {
@@ -33,9 +31,19 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-                vertical-align: top; /* Dodajemy właściwość vertical-align: top; */
-                height: 50px; /* Ustalamy stałą wysokość komórek */
+                vertical-align: top;
+                height: 50px;
             }
+
+                .group-table th.logo-column,
+                .group-table td.logo-column {
+                    width: 25%; /* Adjust this width as needed */
+                }
+
+                .group-table th.name-column,
+                .group-table td.name-column {
+                    width: 75%; /* Adjust this width as needed */
+                }
 
         .group-header {
             background-color: #007bff;
@@ -53,66 +61,152 @@
 
         .group-header h3 {
             margin: 10px 0;
+            font-size: 30px;
         }
 
         .team-name {
-            padding-top: 30px; /* Dodajemy dodatkowy margines z góry */
+            margin: 0; /* Reset margin */
+            font-size: 15px;
         }
+
+        .team-name-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px; /* Ensure the height matches the cell height */
+        }
+
+        .selected-team {
+            background-color: darkblue;
+            color: white;
+        }
+
+        .europe-league {
+            background-color: red;
+            color: white;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            color: green;
+        }
+
+            .buttons button {
+                margin-bottom: 10px;
+                padding: 10px;
+                font-size: 16px;
+                color: green;
+                cursor: pointer;
+            }
     </style>
+    <script>
+        function selectTeams() {
+            const groupTables = document.querySelectorAll('.group-container table.group-table');
+
+            // Iteracja przez każdą tabelę z grupą
+            groupTables.forEach(table => {
+                // Usunięcie wcześniej zaznaczonych drużyn
+                const selectedTeams = table.querySelectorAll('.selected-team');
+                selectedTeams.forEach(team => {
+                    team.classList.remove('selected-team', 'europe-league');
+                });
+
+                // Zaznaczenie odpowiednich drużyn w każdej grupie
+                const teamRows = table.querySelectorAll('tbody tr');
+                if (teamRows.length >= 2) {
+                    teamRows[1].classList.add('selected-team'); // Pierwsza drużyna
+                }
+                if (teamRows.length >= 3) {
+                    teamRows[teamRows.length - 3].classList.add('selected-team'); // Druga drużyna od końca
+                }
+                if (teamRows.length >= 4) {
+                    teamRows[teamRows.length - 2].classList.add('europe-league'); // Trzecia drużyna od końca (Europa League)
+                }
+            });
+
+            // Pobranie zaznaczonych drużyn i ich danych
+            const selectedTeams = Array.from(document.querySelectorAll('.selected-team')).map(row => {
+                return {
+                    name: row.querySelector('.team-name').innerText.trim(),
+                    id: row.dataset.id
+                };
+            });
+            console.log('Selected teams:', selectedTeams);
+        }
+
+
+
+        function proceedToKnockout() {
+            const selectedTeams = document.querySelectorAll('.selected-team');
+            const selectedTeamIds = Array.from(selectedTeams).map(team => team.dataset.id);
+
+            fetch('/Teams/ProceedToKnockout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ selectedTeamIds: selectedTeamIds })
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = '/Teams/KnockoutStage';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('button[onclick="selectTeams()"]').addEventListener('click', selectTeams);
+        });
+    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Groups</h1>
+        <div class="buttons">
+            <button onclick="selectTeams()">Select Teams for Knockout Stage</button>
+            <button onclick="proceedToKnockout()">Proceed to Knockout Stage</button>
+        </div>
 
-        <div class="group-container">
-            <table class="group-table">
-                <thead>
-                    <tr>
-                        @for (int i = 0; i < 2; i++)
-                        {
-                            <th>Group @((i * 4) + 1) - @((i * 4) + 4)</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        @for (int i = 0; i < 2; i++)
-                        {
-                            <td>
-                                @for (int j = 0; j < 4; j++)
+        @for (int i = 0; i < Model.Count; i += 4)
+        {
+            <div class="group-container">
+                <table class="group-table">
+                    <tbody>
+                        <tr>
+                            @for (int j = 0; j < 4; j++)
+                            {
+                                if (i + j < Model.Count)
                                 {
-                                    var index = (i * 4) + j;
-                                    if (index < Model.Count)
-                                    {
-                                        var group = Model[index];
+                                    var group = Model[i + j];
+                                    <td>
                                         <div class="group-header">
                                             <h3>@group.Name</h3>
                                         </div>
                                         <table class="group-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Logo</th>
-                                                    <th>Team Name</th>
+                                                    <th class="logo-column">Logo</th>
+                                                    <th class="name-column">Team Name</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach (var team in group.Teams)
                                                 {
-                                                    <tr>
-                                                        <td><img src="@team.Photo" alt="@team.Name" class="team-logo"></td>
-                                                        <td class="team-name">@team.Name</td>
+                                                    <tr class="@(((List<string>)ViewData["SelectedTeamIds"]).Contains(team.Id) ? "selected-team" : "")" data-id="@team.Id">
+                                                        <td class="logo-column"><img src="@team.Photo" alt="@team.Name" class="team-logo"></td>
+                                                        <td class="team-name-cell"><div class="team-name name-column">@team.Name</div></td>
                                                     </tr>
                                                 }
                                             </tbody>
                                         </table>
-                                    }
+                                    </td>
                                 }
-                            </td>
-                        }
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
 </body>
 </html>

@@ -54,7 +54,6 @@ namespace WebApplication1.Controllers
             return Json(teams);
         }
 
-        [HttpGet("DrawGroups")]
         public IActionResult DrawGroups()
         {
             // Pobieramy wybrane zespoły z sesji
@@ -62,14 +61,39 @@ namespace WebApplication1.Controllers
             if (selectedClubs == null || selectedClubs.Count == 0)
             {
                 // Obsługa sytuacji, gdy nie ma wybranych zespołów w sesji
-                // Możesz przekierować użytkownika z powrotem do strony wyboru zespołów lub wyświetlić odpowiedni komunikat
                 return RedirectToAction("ChooseTeam");
             }
+
+            var selectedTeamIds = HttpContext.Session.GetObject<List<string>>("SelectedTeamIds") ?? new List<string>(); // Pobieramy wybrane ID zespołów z sesji
+            ViewData["SelectedTeamIds"] = selectedTeamIds; // Przekazujemy listę wybranych ID zespołów do widoku
 
             _logger.LogInformation($"Number of selected clubs: {selectedClubs.Count}");
             var groups = CreateGroups(selectedClubs);
             _logger.LogInformation($"Number of groups created: {groups.Count}");
             return View(groups);
+        }
+
+        [HttpPost]
+        public IActionResult ProceedToKnockout([FromBody] Dictionary<string, List<string>> selectedTeams)
+        {
+            var selectedTeamIds = selectedTeams["selectedTeamIds"];
+            HttpContext.Session.SetObject("SelectedTeamIds", selectedTeamIds);
+            return Ok();
+        }
+
+        [HttpGet("KnockoutStage")]
+        public IActionResult KnockoutStage()
+        {
+            var selectedTeamIds = HttpContext.Session.GetObject<List<string>>("KnockoutTeamIds");
+            if (selectedTeamIds == null || selectedTeamIds.Count != 32) // Sprawdź czy jest odpowiednia liczba drużyn
+            {
+                return RedirectToAction("DrawGroups");
+            }
+
+            var selectedClubs = _clubsService.GetSelectedClubs().Where(club => selectedTeamIds.Contains(club.Id)).ToList();
+            var groups = CreateGroups(selectedClubs);
+            var pairs = CreateKnockoutPairs(groups);
+            return View(pairs);
         }
 
         private List<Group> CreateGroups(List<Club> clubs)
@@ -95,5 +119,28 @@ namespace WebApplication1.Controllers
 
             return groups;
         }
+
+        private List<(Club, Club)> CreateKnockoutPairs(List<Group> groups)
+        {
+            var pairs = new List<(Club, Club)>();
+            var random = new Random();
+
+            foreach (var group in groups)
+            {
+                // Sprawdź, czy grupa ma co najmniej dwie drużyny
+                if (group.Teams.Count >= 2)
+                {
+                    var selectedTeams = group.Teams.OrderBy(t => random.Next()).Take(2).ToList();
+                    pairs.Add((selectedTeams[0], selectedTeams[1]));
+                }
+                else
+                {
+                    _logger.LogWarning($"Group {group.Name} has less than 2 teams and will be skipped in knockout pairs generation.");
+                }
+            }
+
+            return pairs;
+        }
+
     }
 }

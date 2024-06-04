@@ -21,6 +21,5 @@ namespace WebApplication1.Models
         [BsonElement("photo")]
         public string Photo { get; set; } = String.Empty;
 
-
     }
 }
