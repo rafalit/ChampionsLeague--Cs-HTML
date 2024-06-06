@@ -5,10 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choose 32 Teams</title>
     <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .header {
+            background-color: #000;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-bottom: 20px;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         #teamThumbnails {
             display: grid;
             grid-template-columns: repeat(5, 1fr); /* 5 columns */
-            gap: 20px 20px; /* space between items */
+            gap: 20px; /* space between items */
         }
 
         .team-container {
@@ -20,7 +43,13 @@
             border: 2px solid gray; /* Default gray border */
             position: relative;
             box-sizing: border-box;
+            background-color: white;
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
+
+            .team-container:hover {
+                transform: scale(1.05);
+            }
 
         .team-thumbnail {
             max-width: 100%;
@@ -47,12 +76,16 @@
     </style>
 </head>
 <body>
-    <h1>Choose 32 Teams</h1>
-    <form id="teamSelectionForm" action="/Teams/SelectTeam" method="post">
-        <input type="hidden" id="selectedTeam" name="teamId" value="">
-    </form>
-    <div id="teamThumbnails">
-        <!-- Team thumbnails will be dynamically inserted here -->
+    <div class="header">
+        Choose 32 Teams
+    </div>
+    <div class="container">
+        <form id="teamSelectionForm" action="/Teams/SelectTeam" method="post">
+            <input type="hidden" id="selectedTeam" name="teamId" value="">
+        </form>
+        <div id="teamThumbnails">
+            <!-- Team thumbnails will be dynamically inserted here -->
+        </div>
     </div>
 
     <script>

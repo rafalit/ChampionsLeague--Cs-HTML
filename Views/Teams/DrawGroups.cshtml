@@ -6,14 +6,33 @@
     <title>Draw Groups</title>
     <style>
         body {
-            font-family: Bebas Neue;
+            font-family: 'Bebas Neue', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
         }
+
+        .header {
+            background-color: #000;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-bottom: 20px;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 36px;
+            }
 
         .group-table {
             width: 100%;
@@ -23,30 +42,30 @@
             border: 2px solid #ddd;
         }
 
-        .group-table th,
-        .group-table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            vertical-align: top;
-            height: 50px;
-        }
+            .group-table th,
+            .group-table td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: center;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                vertical-align: middle;
+                height: 50px;
+            }
 
-        .group-table th.logo-column,
-        .group-table td.logo-column {
-            width: 25%;
-        }
+                .group-table th.logo-column,
+                .group-table td.logo-column {
+                    width: 25%;
+                }
 
-        .group-table th.name-column,
-        .group-table td.name-column {
-            width: 75%;
-        }
+                .group-table th.name-column,
+                .group-table td.name-column {
+                    width: 75%;
+                }
 
         .group-header {
-            background-color: #007bff;
+            background-color: black;
             color: white;
         }
 
@@ -87,18 +106,34 @@
         }
 
         .buttons {
+            position: absolute;
+            right: 5px;
+            top: 5px;
             display: flex;
             flex-direction: column;
-            margin-bottom: 20px;
-            color: green;
         }
 
-        .buttons button {
-            margin-bottom: 10px;
-            padding: 10px;
-            font-size: 16px;
-            color: green;
-            cursor: pointer;
+            .buttons button {
+                width: 200px;
+                margin-bottom: 10px;
+                padding: 10px;
+                font-size: 14px;
+                background-color: green;
+                color: white;
+                border: none;
+                cursor: pointer;
+                border-radius: 4px;
+                text-align: center;
+            }
+
+                .buttons button:hover {
+                    background-color: darkgreen;
+                }
+
+        th.logo-column, th.name-column {
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
     </style>
     <script src="https://randojs.com/1.0.0.js"></script>
@@ -180,12 +215,15 @@
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="header">
+        <h1>Group Stage</h1>
         <div class="buttons">
+            <!-- Przeniesiono przyciski do nagłówka -->
             <button onclick="assignColors()">Select Teams for Knockout Stage</button>
             <button onclick="proceedToKnockout()">Proceed to Knockout Stage</button>
         </div>
-
+    </div>
+    <div class="container">
         @for (int i = 0; i < Model.Count; i += 4)
         {
             <div class="group-container">

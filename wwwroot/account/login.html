@@ -17,42 +17,48 @@
 
         .container {
             background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 320px;
             text-align: center;
         }
 
         h1 {
-            margin-bottom: 20px;
+            margin-bottom: 30px;
+            font-size: 24px;
+            color: #333;
         }
 
         label {
             display: block;
-            margin: 10px 0 5px;
+            margin: 15px 0 5px;
             text-align: left;
+            font-size: 14px;
+            color: #555;
         }
 
         input[type="text"],
         input[type="password"] {
             width: 100%;
-            padding: 10px;
-            margin: 5px 0 15px;
+            padding: 12px;
+            margin: 8px 0 20px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 5px;
             box-sizing: border-box;
+            font-size: 14px;
         }
 
         input[type="submit"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background-color: #007bff;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             color: white;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
             input[type="submit"]:hover {
@@ -60,7 +66,8 @@
             }
 
         .links {
-            margin-top: 20px;
+            margin-top: 25px;
+            font-size: 14px;
         }
 
             .links a {
@@ -77,6 +84,11 @@
             color: red;
             margin-bottom: 15px;
         }
+
+        .success-message {
+            color: green;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -90,16 +102,15 @@
             </div>
             <!-- Username and password inputs -->
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username">
+            <input type="text" id="username" name="username" required>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password">
+            <input type="password" id="password" name="password" required>
             <!-- Submit button -->
             <input type="submit" value="Login">
         </form>
         <!-- Registration success message -->
         <div id="success-message" class="success-message">
             <!-- Success message will be displayed here -->
-            <!-- JavaScript code to display the success message -->
         </div>
         <!-- Links -->
         <div class="links">

@@ -1,7 +1,4 @@
-﻿@using WebApplication1.Models
-@model List<(Club, Club)>
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>Knockout Stage</title>
@@ -12,44 +9,109 @@
             align-items: center;
         }
 
-            .knockout-stage .match {
-                display: flex;
-                align-items: center;
-                margin-bottom: 20px;
+        .match-row {
+            display: flex;
+            align-items: center; /* Wyśrodkowanie pionowe */
+            width: 100%;
+            margin-bottom: 370px; /* Zwiększ odległość między rzędami */
+        }
+
+        .match-column {
+            display: flex;
+            justify-content: space-between; /* Rozłożenie par równomiernie */
+            align-items: center;
+            height: 120px; /* Ustaw wysokość kolumn */
+        }
+
+        .match {
+            display: flex;
+            align-items: center;
+            margin-right: 150px; /* Zwiększ odstęp między parami */
+            flex: 0 0 auto; /* Ustaw stałą szerokość dla par */
+        }
+
+            .match:last-child {
+                margin-right: 0; /* Usuń margines dla ostatniego elementu w wierszu */
             }
 
-                .knockout-stage .match img {
-                    width: 100px;
-                    height: 100px;
-                    margin-right: 20px;
-                }
+            .match img {
+                flex: 0 0 auto; /* Ustaw stałą szerokość dla obrazków */
+                height: 120px; /* Dopasuj wysokość obrazu */
+                margin-right: 10px;
+            }
 
-                .knockout-stage .match .vs {
-                    font-size: 20px;
-                    font-weight: bold;
-                }
+        .round {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .next-stage-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <h2>Knockout Stage</h2>
     <div class="knockout-stage">
-        @foreach (var knockoutPair in Model)
-        {
-            <div class="match">
-                @if (knockoutPair.Item1 != null && knockoutPair.Item2 != null)
+        <div class="match-row">
+            <div class="match-column">
+                @for (int j = 0; j < 4; j++)
                 {
-                    <img src="@knockoutPair.Item1.Photo" alt="@knockoutPair.Item1.Name" />
-                    <span class="vs">vs</span>
-                    <img src="@knockoutPair.Item2.Photo" alt="@knockoutPair.Item2.Name" />
-                }
-                else
-                {
-                    <span class="vs">Unknown Team</span>
-                    <span class="vs">vs</span>
-                    <span class="vs">Unknown Team</span>
+                    <div class="match">
+                        @if (Model[j].Item1 != null && Model[j].Item2 != null)
+                        {
+                            <img src="@Model[j].Item1.Photo" alt="@Model[j].Item1.Name" />
+                            <img src="@Model[j].Item2.Photo" alt="@Model[j].Item2.Name" />
+                        }
+                        else
+                        {
+                            <span>Unknown Team</span>
+                            <span>Unknown Team</span>
+                        }
+                    </div>
                 }
             </div>
-        }
+        </div>
+
+        <div class="match-row" style="margin-bottom: 100px;">
+            <!-- Zwiększ odległość od dolnego rzędu -->
+            <div class="match-column">
+                @for (int j = 4; j < 8; j++)
+                {
+                    <div class="match">
+                        @if (Model[j].Item1 != null && Model[j].Item2 != null)
+                        {
+                            <img src="@Model[j].Item1.Photo" alt="@Model[j].Item1.Name" />
+                            <img src="@Model[j].Item2.Photo" alt="@Model[j].Item2.Name" />
+                        }
+                        else
+                        {
+                            <span>Unknown Team</span>
+                            <span>Unknown Team</span>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <button class="next-stage-btn" onclick="nextStage()">Next Stage</button>
     </div>
+
+    <script>
+        function nextStage() {
+            // Tutaj możesz dodać logikę przeprowadzania losowania i tworzenia nowych par
+            alert("Next stage logic goes here");
+        }
+    </script>
 </body>
 </html>
