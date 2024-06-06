@@ -3,54 +3,68 @@
 <head>
     <title>Knockout Stage</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        .header {
+            background-color: #000;
+            color: white;
+            text-align: center;
+            padding: 40px;
+            margin-bottom: 5px;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
         .knockout-stage {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        .match-row {
+        .match-container {
             display: flex;
-            align-items: center; /* Wyśrodkowanie pionowe */
+            justify-content: space-between;
             width: 100%;
-            margin-bottom: 370px; /* Zwiększ odległość między rzędami */
+            margin-bottom: 40px;
         }
 
-        .match-column {
-            display: flex;
-            justify-content: space-between; /* Rozłożenie par równomiernie */
-            align-items: center;
-            height: 120px; /* Ustaw wysokość kolumn */
-        }
-
-        .match {
+        .team-container {
+            flex: 0 0 calc(50% - 10px);
+            background-color: #fff;
+            border: 2px solid #ccc;
+            padding: 20px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            margin-right: 150px; /* Zwiększ odstęp między parami */
-            flex: 0 0 auto; /* Ustaw stałą szerokość dla par */
+            justify-content: center;
+            transition: background-color 0.3s;
         }
 
-            .match:last-child {
-                margin-right: 0; /* Usuń margines dla ostatniego elementu w wierszu */
-            }
-
-            .match img {
-                flex: 0 0 auto; /* Ustaw stałą szerokość dla obrazków */
-                height: 120px; /* Dopasuj wysokość obrazu */
+            .team-container img {
+                height: 60px;
                 margin-right: 10px;
             }
 
-        .round {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 50px;
-        }
+            .team-container input[type="radio"] {
+                display: none;
+            }
+
+            .team-container.selected {
+                background-color: lightgreen;
+            }
 
         .next-stage-btn {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             padding: 10px 20px;
             background-color: #007bff;
             color: white;
@@ -58,59 +72,143 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        .winner {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .winner img {
+                height: 150px;
+            }
+
+            .winner p {
+                font-size: 24px;
+                font-weight: bold;
+                margin-top: 10px;
+            }
     </style>
 </head>
 <body>
-    <h2>Knockout Stage</h2>
-    <div class="knockout-stage">
-        <div class="match-row">
-            <div class="match-column">
-                @for (int j = 0; j < 4; j++)
-                {
-                    <div class="match">
-                        @if (Model[j].Item1 != null && Model[j].Item2 != null)
-                        {
-                            <img src="@Model[j].Item1.Photo" alt="@Model[j].Item1.Name" />
-                            <img src="@Model[j].Item2.Photo" alt="@Model[j].Item2.Name" />
-                        }
-                        else
-                        {
-                            <span>Unknown Team</span>
-                            <span>Unknown Team</span>
-                        }
-                    </div>
-                }
+    <div class="header">Knockout Stage</div>
+    <div class="knockout-stage" id="knockoutStage">
+        @{
+            int parCount = Model.Count;
+        }
+        @for (int i = 0; i < parCount; i++)
+        {
+            <div class="match-container">
+                <div class="team-container" id="team@(i+1)-1" onclick="selectWinner(this, @(i+1))">
+                    <input type="radio" name="winner@(i+1)" value="@Model[i].Item1.Name" id="team1@(i+1)">
+                    <label for="team1@(i+1)">
+                        <img src="@Model[i].Item1.Photo" alt="@Model[i].Item1.Name" />
+                        <span>@Model[i].Item1.Name</span>
+                    </label>
+                </div>
+                <div class="team-container" id="team@(i+1)-2" onclick="selectWinner(this, @(i+1))">
+                    <input type="radio" name="winner@(i+1)" value="@Model[i].Item2.Name" id="team2@(i+1)">
+                    <label for="team2@(i+1)">
+                        <img src="@Model[i].Item2.Photo" alt="@Model[i].Item2.Name" />
+                        <span>@Model[i].Item2.Name</span>
+                    </label>
+                </div>
             </div>
-        </div>
-
-        <div class="match-row" style="margin-bottom: 100px;">
-            <!-- Zwiększ odległość od dolnego rzędu -->
-            <div class="match-column">
-                @for (int j = 4; j < 8; j++)
-                {
-                    <div class="match">
-                        @if (Model[j].Item1 != null && Model[j].Item2 != null)
-                        {
-                            <img src="@Model[j].Item1.Photo" alt="@Model[j].Item1.Name" />
-                            <img src="@Model[j].Item2.Photo" alt="@Model[j].Item2.Name" />
-                        }
-                        else
-                        {
-                            <span>Unknown Team</span>
-                            <span>Unknown Team</span>
-                        }
-                    </div>
-                }
-            </div>
-        </div>
-
-        <button class="next-stage-btn" onclick="nextStage()">Next Stage</button>
+        }
     </div>
 
+    <button class="next-stage-btn" onclick="nextStage()">Next Stage</button>
+
+    <div class="winner" id="winner"></div>
+
     <script>
+        function selectWinner(teamContainer, matchNumber) {
+            var matchContainers = document.querySelectorAll(`.team-container[id^='team${matchNumber}-']`);
+
+            matchContainers.forEach(function (container) {
+                container.classList.remove('selected');
+                container.querySelector('input[type="radio"]').checked = false;
+            });
+
+            teamContainer.classList.add('selected');
+            teamContainer.querySelector('input[type="radio"]').checked = true;
+        }
+
         function nextStage() {
-            // Tutaj możesz dodać logikę przeprowadzania losowania i tworzenia nowych par
-            alert("Next stage logic goes here");
+            var selectedWinners = [];
+            var matches = document.querySelectorAll('.team-container.selected');
+            matches.forEach(function (match) {
+                selectedWinners.push({
+                    name: match.querySelector('input[type="radio"]').value,
+                    photo: match.querySelector('img').src
+                });
+            });
+
+            if (selectedWinners.length === document.querySelectorAll('.match-container').length) {
+                // Proceed to next stage logic
+                console.log('Selected Winners:', selectedWinners);
+                if (selectedWinners.length === 1) {
+                    displayWinner(selectedWinners[0]);
+                } else {
+                    generateNextStage(selectedWinners);
+                }
+            } else {
+                alert('Select a winner for each match before proceeding to the next stage.');
+            }
+        }
+
+        function generateNextStage(winners) {
+            var knockoutStage = document.getElementById('knockoutStage');
+            knockoutStage.innerHTML = ''; // Clear the current stage
+
+            // Calculate the number of new pairs
+            var newPairs = winners.length / 2;
+
+            for (var i = 0; i < newPairs; i++) {
+                var team1 = winners[i * 2];
+                var team2 = winners[i * 2 + 1];
+
+                var matchContainer = document.createElement('div');
+                matchContainer.classList.add('match-container');
+
+                var teamContainer1 = document.createElement('div');
+                teamContainer1.classList.add('team-container');
+                teamContainer1.setAttribute('id', 'team' + (i + 1) + '-1');
+                teamContainer1.setAttribute('onclick', 'selectWinner(this, ' + (i + 1) + ')');
+                teamContainer1.innerHTML = `
+                            <input type="radio" name="winner${i + 1}" value="${team1.name}" id="team1${i + 1}">
+                            <label for="team1${i + 1}">
+                                <img src="${team1.photo}" alt="${team1.name}" />
+                                <span>${team1.name}</span>
+                            </label>
+                        `;
+
+                var teamContainer2 = document.createElement('div');
+                teamContainer2.classList.add('team-container');
+                teamContainer2.setAttribute('id', 'team' + (i + 1) + '-2');
+                teamContainer2.setAttribute('onclick', 'selectWinner(this, ' + (i + 1) + ')');
+                teamContainer2.innerHTML = `
+                            <input type="radio" name="winner${i + 1}" value="${team2.name}" id="team2${i + 1}">
+                            <label for="team2${i + 1}">
+                                <img src="${team2.photo}" alt="${team2.name}" />
+                                <span>${team2.name}</span>
+                            </label>
+                        `;
+
+                matchContainer.appendChild(teamContainer1);
+                matchContainer.appendChild(teamContainer2);
+
+                knockoutStage.appendChild(matchContainer);
+            }
+        }
+
+        function displayWinner(winner) {
+            var winnerDiv = document.getElementById('winner');
+            winnerDiv.innerHTML = `
+                        <h2>Champion</h2>
+                        <div class="winner selected">
+                            <img src="${winner.photo}" alt="${winner.name}">
+                            <p>${winner.name}</p>
+                        </div>`;
         }
     </script>
 </body>
