@@ -37,12 +37,12 @@
 
         .group-table th.logo-column,
         .group-table td.logo-column {
-            width: 25%; /* Adjust this width as needed */
+            width: 25%;
         }
 
         .group-table th.name-column,
         .group-table td.name-column {
-            width: 75%; /* Adjust this width as needed */
+            width: 75%;
         }
 
         .group-header {
@@ -65,15 +65,15 @@
         }
 
         .team-name {
-            margin: 0; /* Reset margin */
-            font-size: 15px;
+            margin: 0;
+            font-size: 20px;
         }
 
         .team-name-cell {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 50px; /* Ensure the height matches the cell height */
+            height: 50px;
         }
 
         .selected-team {
@@ -106,9 +106,8 @@
         function swapAndSelectTeams() {
             const groupTables = document.querySelectorAll('.group-container table.group-table');
             groupTables.forEach(table => {
-                const teamRows = table.querySelectorAll('tbody tr'); // Wybieramy tylko wiersze zespołów, pomijając nagłówki
+                const teamRows = table.querySelectorAll('tbody tr');
 
-                // Zamiana miejscami odpowiednich rzędów
                 if (teamRows.length >= 4) {
                     const firstTeam = teamRows[rando(1, 4)];
                     const secondTeam = teamRows[rando(1, 4)];
@@ -120,7 +119,6 @@
                         swapRows(thirdTeam, fourthTeam);
                     }
                 }
-
             });
         }
 
@@ -137,15 +135,11 @@
         }
 
         function assignColors() {
-            
             swapAndSelectTeams();
-            
+
             const groupTables = document.querySelectorAll('.group-container table.group-table');
 
-            // Iteracja przez każdą tabelę z grupą
             groupTables.forEach(table => {
-                
-                // Usunięcie wcześniej zaznaczonych drużyn
                 const selectedTeams = table.querySelectorAll('.selected-team');
                 const europeTeams = table.querySelectorAll('.europe-league');
 
@@ -156,39 +150,27 @@
                     team.classList.remove('europe-league');
                 });
 
-                // Zaznaczenie odpowiednich drużyn w każdej grupie
                 const teamRows = table.querySelectorAll('tbody tr');
-                
+
                 if (teamRows.length == 5) {
                     teamRows[1].classList.add('selected-team');
                     teamRows[2].classList.add('selected-team');
-                    teamRows[3].classList.add('europe-league'); // Trzecia drużyna od końca (Europa League)
+                    teamRows[3].classList.add('europe-league');
                 }
-                console.log(table);
             });
-
-            
-
-            // Pobranie zaznaczonych drużyn i ich danych
-            const selectedTeams = Array.from(document.querySelectorAll('.selected-team')).map(row => {
-                return {
-                    name: row.querySelector('.team-name').innerText.trim(),
-                    id: row.dataset.id
-                };
-            });
-            //console.log(selectedTeams);
         }
 
         function proceedToKnockout() {
-            const selectedTeams = document.querySelectorAll('.selected-team');
-            const selectedTeamIds = Array.from(selectedTeams).map(team => team.dataset.id);
+            const selectedClubIds = Array.from(document.querySelectorAll('.selected-team')).map(row => {
+                return row.dataset.id;
+            });
 
             fetch('/Teams/ProceedToKnockout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ selectedTeamIds: selectedTeamIds })
+                body: JSON.stringify(selectedClubIds)
             }).then(response => {
                 if (response.ok) {
                     window.location.href = '/Teams/KnockoutStage';

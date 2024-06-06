@@ -9,6 +9,7 @@ namespace WebApplication1.Services
     {
         private readonly IMongoCollection<Club> _clubs;
         private List<Club> _selectedClubs;
+        private List<(Club, Club)> _knockoutPairs = new List<(Club, Club)>();
 
         public ClubsService(IClubsStoreDatabaseSettings settings, IMongoClient mongoClient)
         {
@@ -31,6 +32,11 @@ namespace WebApplication1.Services
         public Club Get(string id)
         {
             return _clubs.Find(club => club.Id == id).FirstOrDefault();
+        }
+
+        public List<Club> GetClubsByIds(List<string> clubIds)
+        {
+            return _clubs.Find(club => clubIds.Contains(club.Id)).ToList();
         }
 
         public void Remove(string id)
@@ -60,6 +66,16 @@ namespace WebApplication1.Services
         public List<Club> GetSelectedClubs()
         {
             return _selectedClubs;
+        }
+
+        public void SetKnockoutPairs(List<(Club, Club)> pairs)
+        {
+            _knockoutPairs = pairs;
+        }
+
+        public List<(Club, Club)> GetKnockoutPairs()
+        {
+            return _knockoutPairs;
         }
     }
 }

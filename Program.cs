@@ -95,6 +95,11 @@ app.UseEndpoints(endpoints =>
         name: "chooseTeam",
         pattern: "Teams/ChooseTeam",
         defaults: new { controller = "Teams", action = "ChooseTeam" });
+
+    endpoints.MapControllerRoute(
+        name: "knockoutStage",
+        pattern: "Teams/KnockoutStage",
+        defaults: new { controller = "Teams", action = "KnockoutStage" });
 });
 
 app.Run();
