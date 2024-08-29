@@ -53,6 +53,24 @@ namespace WebApplication1.Controllers
             return RedirectToAction("ChooseTeam");
         }
 
+        public IActionResult DrawGroups()
+        {
+            // Pobieramy wybrane zespoły z sesji
+            var selectedClubs = HttpContext.Session.GetObject<List<Club>>("SelectedClubs");
+            if (selectedClubs == null || selectedClubs.Count == 0)
+            {
+                // Obsługa sytuacji, gdy nie ma wybranych zespołów w sesji
+                return RedirectToAction("ChooseTeam");
+            }
+
+            var selectedTeamIds = HttpContext.Session.GetObject<List<string>>("SelectedTeamIds") ?? new List<string>(); // Pobieramy wybrane ID zespołów z sesji
+
+            ViewData["SelectedTeamIds"] = selectedTeamIds; // Przekazujemy listę wybranych ID zespołów do widoku
+
+            var groups = CreateGroups(selectedClubs);
+            return View(groups);
+        }
+
         private List<Group> CreateGroups(List<Club> clubs)
         {
             var groups = new List<Group>();
@@ -74,24 +92,6 @@ namespace WebApplication1.Controllers
             }
 
             return groups;
-        }
-
-        public IActionResult DrawGroups()
-        {
-            // Pobieramy wybrane zespoły z sesji
-            var selectedClubs = HttpContext.Session.GetObject<List<Club>>("SelectedClubs");
-            if (selectedClubs == null || selectedClubs.Count == 0)
-            {
-                // Obsługa sytuacji, gdy nie ma wybranych zespołów w sesji
-                return RedirectToAction("ChooseTeam");
-            }
-
-            var selectedTeamIds = HttpContext.Session.GetObject<List<string>>("SelectedTeamIds") ?? new List<string>(); // Pobieramy wybrane ID zespołów z sesji
-
-            ViewData["SelectedTeamIds"] = selectedTeamIds; // Przekazujemy listę wybranych ID zespołów do widoku
-
-            var groups = CreateGroups(selectedClubs);
-            return View(groups);
         }
 
         [HttpPost]
