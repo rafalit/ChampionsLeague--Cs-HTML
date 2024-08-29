@@ -81,3 +81,12 @@ builder.Services.AddSession(options =>
 ```
 ## Video Overview
 
+The following videos provide an overview and demonstration of the application:
+
+- **[Video 1](./vid1.mkv)** Demonstrates the registration and login process..
+
+- **[Video 2](./vid2.mkv)** Shows the team selection process.
+
+- **[Video 3](./vid3.mkv)** Walkthrough of the group stage setup.
+
+- **[Video 4](./vid4.mkv)** Overview of the knockout stage.
